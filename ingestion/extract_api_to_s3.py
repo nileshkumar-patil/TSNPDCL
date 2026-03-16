@@ -4,7 +4,7 @@ import boto3
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
-S3_BUCKET = "tsnpdcl-datalake-poc"
+S3_BUCKET = "tsnpdcl-analytics-datalake-poc-dev"
 S3_PREFIX = "data/source/"
 API_URL = "https://data.telangana.gov.in/api/1/metastore/schemas/dataset/items/ae305fca-068b-4e61-b7f8-d9bf651e1b69?show-reference-ids=true"
 
