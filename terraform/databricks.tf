@@ -20,10 +20,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
     notebook_task {
       notebook_path   = "${var.workspace_code_path}/etl/bronze.ipynb"
     }
-
-    compute {
-      cluster_id = null # Serverless
-    }
   }
 
   # ---------------------------------------------------
@@ -38,10 +34,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
 
     notebook_task {
       notebook_path   = "${var.workspace_code_path}/etl/silver.ipynb"
-    }
-
-    compute {
-      cluster_id = null # Serverless
     }
   }
 
@@ -58,10 +50,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
     notebook_task {
       notebook_path   = "${var.workspace_code_path}/tests/test_data_quality.ipynb"
     }
-
-    compute {
-      cluster_id = null # Serverless
-    }
   }
 
   # ---------------------------------------------------
@@ -76,10 +64,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
 
     notebook_task {
       notebook_path   = "${var.workspace_code_path}/etl/gold.ipynb"
-    }
-
-    compute {
-      cluster_id = null # Serverless
     }
   }
 
