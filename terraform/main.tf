@@ -43,6 +43,12 @@ resource "aws_s3_bucket_versioning" "datalake_versioning" {
   }
 }
 
+# Create the internal trigger directory to satisfy Databricks job validation
+resource "aws_s3_object" "trigger_dir" {
+  bucket = aws_s3_bucket.datalake.id
+  key    = "trigger/"
+}
+
 # ------------------------------------------------------------------------------
 # IAM Cross-Account Role for Databricks Access
 # ------------------------------------------------------------------------------
@@ -116,7 +122,7 @@ resource "time_sleep" "wait_for_iam" {
 
 # 1. Create the Storage Credential mapping to the AWS IAM Role
 resource "databricks_storage_credential" "datalake_cred" {
-  name = "${var.project_prefix}-s3-cred-${var.environment}"
+  name = "${var.project_prefix}-data-cred-${var.environment}"
   aws_iam_role {
     role_arn = aws_iam_role.databricks_data_access.arn
   }

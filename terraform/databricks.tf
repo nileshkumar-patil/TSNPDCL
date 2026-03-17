@@ -72,7 +72,7 @@ resource "databricks_job" "tsnpdcl_pipeline" {
   # Trigger on S3 file arrival
   trigger {
     file_arrival {
-      url = "s3://${aws_s3_bucket.datalake.id}/trigger/"
+      url = "s3://${aws_s3_bucket.datalake.id}/${aws_s3_object.trigger_dir.key}"
     }
   }
 }
