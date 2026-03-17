@@ -73,11 +73,17 @@ data "aws_iam_policy_document" "databricks_trust_policy" {
   ]
 
   # Explicitly allow self-assume to satisfy Unity Catalog storage credential validation
+  # Using the account root + condition to bypass AWS's 'MalformedPolicyDocument' during role creation
   statement {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_prefix}-databricks-access-${var.environment}"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:PrincipalArn"
+      values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_prefix}-databricks-access-${var.environment}"]
     }
   }
 }
