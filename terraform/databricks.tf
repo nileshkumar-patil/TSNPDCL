@@ -81,12 +81,12 @@ resource "databricks_job" "tsnpdcl_pipeline" {
 # 3. Automated Lakeview Dashboard creation via Terraform
 # ------------------------------------------------------------------------------
 resource "databricks_dashboard" "executive_summary" {
-  display_name = "TSNPDCL Smart Grid Executive Summary"
+  display_name = "TSNPDCL Smart Grid Executive Summary (${var.environment})"
   warehouse_id = var.sql_warehouse_id
   parent_path  = "/Workspace/Users/nileshkumar.patil@zemosolabs.com/Dashboards"
   
   serialized_dashboard = jsonencode({
-    "name" : "TSNPDCL Smart Grid Executive Summary",
+    "name" : "TSNPDCL Smart Grid Executive Summary (${var.environment})",
     "pages" : [
       {
         "name" : "Page_1",

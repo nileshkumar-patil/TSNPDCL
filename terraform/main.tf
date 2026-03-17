@@ -71,6 +71,15 @@ data "aws_iam_policy_document" "databricks_trust_policy" {
     data.databricks_aws_assume_role_policy.workspace.json,
     data.databricks_aws_unity_catalog_assume_role_policy.uc.json
   ]
+
+  # Explicitly allow self-assume to satisfy Unity Catalog storage credential validation
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_prefix}-databricks-access-${var.environment}"]
+    }
+  }
 }
 
 resource "aws_iam_role" "databricks_data_access" {
