@@ -126,13 +126,13 @@ resource "aws_iam_instance_profile" "databricks_profile" {
 # UNITY CATALOG: Storage Credentials & External Locations
 # ==============================================================================
 
-# Add a 15-second delay to ensure AWS IAM Policy propagation globally
+# Add a 60-second delay to ensure AWS IAM Policy propagation globally
 resource "time_sleep" "wait_for_iam" {
   depends_on = [
     aws_iam_role_policy.databricks_s3_access,
     aws_iam_role.databricks_data_access
   ]
-  create_duration = "15s"
+  create_duration = "60s"
 }
 
 # 1. Create the Storage Credential mapping to the AWS IAM Role
@@ -153,6 +153,8 @@ resource "databricks_external_location" "datalake_loc" {
   url             = "s3://${aws_s3_bucket.datalake.id}"
   credential_name = databricks_storage_credential.datalake_cred.id
   comment         = "Managed by Terraform: External Location for Bronze/Silver/Gold data"
+  skip_validation = true
+  force_destroy   = true
   depends_on = [
     databricks_storage_credential.datalake_cred
   ]
