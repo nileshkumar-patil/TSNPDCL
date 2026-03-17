@@ -1,19 +1,6 @@
 resource "databricks_job" "tsnpdcl_pipeline" {
   name = "${var.project_prefix}-end-to-end-pipeline-${var.environment}"
 
-  job_cluster {
-    job_cluster_key = "serverless_compute"
-
-    new_cluster {
-      spark_version = "14.3.x-scala2.12"
-      node_type_id  = "serverless"
-
-      aws_attributes {
-        instance_profile_arn = aws_iam_instance_profile.databricks_profile.arn
-      }
-    }
-  }
-
   email_notifications {
     on_success = ["nileshkumar.patil@zemosolabs.com"]
     on_failure = ["nileshkumar.patil@zemosolabs.com"]
@@ -24,8 +11,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
   # ---------------------------------------------------
   task {
     task_key = "bronze_ingestion"
-
-    job_cluster_key = "serverless_compute"
 
     notebook_task {
       notebook_path = "${var.workspace_code_path}/etl/bronze.ipynb"
@@ -42,8 +27,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
       task_key = "bronze_ingestion"
     }
 
-    job_cluster_key = "serverless_compute"
-
     notebook_task {
       notebook_path = "${var.workspace_code_path}/etl/silver.ipynb"
     }
@@ -59,8 +42,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
       task_key = "silver_incremental_load"
     }
 
-    job_cluster_key = "serverless_compute"
-
     notebook_task {
       notebook_path = "${var.workspace_code_path}/tests/test_data_quality.ipynb"
     }
@@ -75,8 +56,6 @@ resource "databricks_job" "tsnpdcl_pipeline" {
     depends_on {
       task_key = "data_quality_checks"
     }
-
-    job_cluster_key = "serverless_compute"
 
     notebook_task {
       notebook_path = "${var.workspace_code_path}/etl/gold.ipynb"

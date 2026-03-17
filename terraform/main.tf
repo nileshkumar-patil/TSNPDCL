@@ -8,6 +8,10 @@ terraform {
       source  = "databricks/databricks"
       version = "~> 1.30"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.11"
+    }
   }
 }
 
@@ -101,6 +105,15 @@ resource "aws_iam_instance_profile" "databricks_profile" {
 # UNITY CATALOG: Storage Credentials & External Locations
 # ==============================================================================
 
+# Add a 15-second delay to ensure AWS IAM Policy propagation globally
+resource "time_sleep" "wait_for_iam" {
+  depends_on = [
+    aws_iam_role_policy.databricks_s3_access,
+    aws_iam_role.databricks_data_access
+  ]
+  create_duration = "15s"
+}
+
 # 1. Create the Storage Credential mapping to the AWS IAM Role
 resource "databricks_storage_credential" "datalake_cred" {
   name = "${var.project_prefix}-s3-cred-${var.environment}"
@@ -109,7 +122,7 @@ resource "databricks_storage_credential" "datalake_cred" {
   }
   comment = "Managed by Terraform: Credential for accessing the S3 Data Lake"
   depends_on = [
-    aws_iam_role_policy.databricks_s3_access
+    time_sleep.wait_for_iam
   ]
 }
 
