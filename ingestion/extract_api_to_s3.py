@@ -9,8 +9,10 @@ import os
 S3_BUCKET = os.environ.get("S3_BUCKET", "tsnpdcl-analytics-datalake-poc-dev")
 S3_PREFIX = os.environ.get("S3_PREFIX", "data/source/")
 API_URL = os.environ.get("API_URL", "https://data.telangana.gov.in/api/1/metastore/schemas/dataset/items/ae305fca-068b-4e61-b7f8-d9bf651e1b69?show-reference-ids=true")
+SNS_TOPIC_ARN = os.environ.get("SNS_TOPIC_ARN")
 
 s3_client = boto3.client("s3")
+sns_client = boto3.client("sns")
 
 
 def get_download_links():
@@ -53,12 +55,21 @@ def download_and_upload_to_s3(link):
 
 def lambda_handler(event, context):
 
-    download_links = get_download_links()
+    try:
+        download_links = get_download_links()
+    except Exception as e:
+        if SNS_TOPIC_ARN:
+            sns_client.publish(
+                TopicArn=SNS_TOPIC_ARN,
+                Subject="CRITICAL: TSNPDCL API Ingestion Failed",
+                Message=f"The Telangana API failed to respond or returned invalid data.\nError: {str(e)}"
+            )
+        raise e
 
     max_workers = 10
     files_downloaded = 0
     skipped_files = 0
-    failed_files = 0
+    failed_files = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         tasks = [executor.submit(download_and_upload_to_s3, link) for link in download_links]
@@ -74,7 +85,14 @@ def lambda_handler(event, context):
                 skipped_files += 1
 
             else:
-                failed_files += 1
+                failed_files.append(filename)
+
+    if failed_files and SNS_TOPIC_ARN:
+        sns_client.publish(
+            TopicArn=SNS_TOPIC_ARN,
+            Subject="WARNING: Partial TSNPDCL Ingestion Failure",
+            Message=f"{len(failed_files)} file(s) failed to transfer to S3.\nFailed files: {', '.join(failed_files)}"
+        )
 
     # Trigger Databricks if new files arrived
     if files_downloaded > 0:
@@ -93,6 +111,6 @@ def lambda_handler(event, context):
         "body": json.dumps({
             "files_downloaded": files_downloaded,
             "files_skipped": skipped_files,
-            "files_failed": failed_files
+            "files_failed": len(failed_files)
         })
     }

@@ -39,6 +39,14 @@ data "aws_iam_policy_document" "lambda_s3_log_policy" {
     ]
     resources = ["arn:aws:logs:*:*:*"]
   }
+
+  # SNS Publish Access
+  statement {
+    actions = [
+      "sns:Publish"
+    ]
+    resources = [aws_sns_topic.ingestion_alerts.arn]
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_policy" {
@@ -72,9 +80,10 @@ resource "aws_lambda_function" "api_ingestion" {
 
   environment {
     variables = {
-      S3_BUCKET = aws_s3_bucket.datalake.id
-      S3_PREFIX = "data/source/"
-      API_URL   = "https://data.telangana.gov.in/api/1/metastore/schemas/dataset/items/ae305fca-068b-4e61-b7f8-d9bf651e1b69?show-reference-ids=true"
+      S3_BUCKET     = aws_s3_bucket.datalake.id
+      S3_PREFIX     = "data/source/"
+      API_URL       = "https://data.telangana.gov.in/api/1/metastore/schemas/dataset/items/ae305fca-068b-4e61-b7f8-d9bf651e1b69?show-reference-ids=true"
+      SNS_TOPIC_ARN = aws_sns_topic.ingestion_alerts.arn
     }
   }
 }
@@ -104,4 +113,19 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = aws_lambda_function.api_ingestion.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.daily_ingestion.arn
+}
+
+# ==============================================================================
+# AWS SNS: Alerting Topic
+# ==============================================================================
+
+resource "aws_sns_topic" "ingestion_alerts" {
+  name = "${var.project_prefix}-ingestion-alerts-${var.environment}"
+}
+
+resource "aws_sns_topic_subscription" "email_alerts" {
+  count     = var.alert_email != "" ? 1 : 0
+  topic_arn = aws_sns_topic.ingestion_alerts.arn
+  protocol  = "email"
+  endpoint  = var.alert_email
 }

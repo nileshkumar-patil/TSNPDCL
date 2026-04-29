@@ -11,3 +11,7 @@ terraform/extract_api_to_s3.zip
 
 # Environment Variables
 .env
+
+
+daily_standup.md
+Solution_Design_Document.md

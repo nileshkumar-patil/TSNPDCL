@@ -45,3 +45,9 @@ variable "workspace_code_path" {
   description = "The workspace path where the Databricks notebook code relies"
   default     = "/Workspace/Users/nileshkumar.patil@zemosolabs.com/TSNPDCL"
 }
+
+variable "alert_email" {
+  type        = string
+  description = "Email address to receive SNS alerts for ingestion failures"
+  default     = "nileshkumar.patil@zemosolabs.com"
+}
