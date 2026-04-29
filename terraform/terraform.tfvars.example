@@ -1,0 +1,11 @@
+# Databricks connection and identifiers
+databricks_host         = "https://<your-workspace>.cloud.databricks.com"
+databricks_token        = "<your-personal-access-token>"
+databricks_workspace_id = "<your-workspace-id>"
+databricks_account_id   = "<your-account-id>"
+
+# Optional SQL Warehouse ID (if required)
+sql_warehouse_id        = "<your-sql-warehouse-id>"
+
+# Alerting email (which you already confirmed)
+alert_email             = "nileshkumar.patil@zemosolabs.com"
