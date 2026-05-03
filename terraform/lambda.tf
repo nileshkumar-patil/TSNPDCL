@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "lambda_s3_log_policy" {
       "${aws_s3_bucket.datalake.arn}/*"
     ]
   }
-  
+
   # CloudWatch Logs Access
   statement {
     actions = [
@@ -58,9 +58,9 @@ resource "aws_iam_role_policy" "lambda_policy" {
 # 3. Zip the Python Code
 # Terraform will automatically zip the Python file for us before uploading it to AWS
 data "archive_file" "lambda_zip" {
-  type        = "zip"
+  type = "zip"
   # This path should point to where your extract_api_to_s3.py is located
-  source_file = "${path.module}/../ingestion/extract_api_to_s3.py" 
+  source_file = "${path.module}/../ingestion/extract_api_to_s3.py"
   output_path = "${path.module}/extract_api_to_s3.zip"
 }
 
@@ -68,15 +68,15 @@ data "archive_file" "lambda_zip" {
 resource "aws_lambda_function" "api_ingestion" {
   filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  
+
   function_name = "${var.project_prefix}-api-ingestion-${var.environment}"
   role          = aws_iam_role.lambda_exec_role.arn
-  
-  handler       = "extract_api_to_s3.lambda_handler"
-  runtime       = "python3.10"
-  
-  timeout       = 60  # 1 minute
-  memory_size   = 512 # 512 MB
+
+  handler = "extract_api_to_s3.lambda_handler"
+  runtime = "python3.10"
+
+  timeout     = 60  # 1 minute
+  memory_size = 512 # 512 MB
 
   environment {
     variables = {
@@ -96,7 +96,7 @@ resource "aws_lambda_function" "api_ingestion" {
 resource "aws_cloudwatch_event_rule" "daily_ingestion" {
   name                = "${var.project_prefix}-daily-ingestion-${var.environment}"
   description         = "Triggers the TSNPDCL API ingestion Lambda function daily"
-  schedule_expression = "cron(30 20 * * ? *)" 
+  schedule_expression = "cron(30 20 * * ? *)"
 }
 
 # Attach the schedule to your Lambda function

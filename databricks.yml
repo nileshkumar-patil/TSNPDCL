@@ -17,7 +17,7 @@ resources:
       # Trigger when Lambda finishes sending all files and drops the success token
       trigger:
         file_arrival:
-          url: s3://tsnpdcl-analytics-datalake-poc-dev/trigger/
+          url: s3://tsnpdcl-analytics-datalake-poc-local/trigger/
 
       # Use Serverless Compute instead of EC2 Auto-scaling
       environments:
