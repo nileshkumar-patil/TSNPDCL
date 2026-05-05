@@ -9,7 +9,7 @@ The Northern Power Distribution Company of Telangana (TSNPDCL) Smart Grid Analyt
 *   **Cloud Provider**: AWS (S3 object storage for data lake)
 *   **Data Processing**: Databricks (PySpark)
 *   **Format**: Delta Lake / Parquet (Medallion Architecture)
-*   **Dashboarding Server**: Amazon Athena
+*   **Dashboarding Server**: Databricks Dashboard
 *   **IaC**: Terraform
 *   **CI/CD**: GitHub / GitLab Actions
 
