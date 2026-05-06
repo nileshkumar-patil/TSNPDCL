@@ -51,5 +51,6 @@ targets:
   prod:
     # This explicitly maps to the --target prod executed by GitHub Actions
     workspace:
-      host: https://adb-xxxxx.cloud.databricks.com # The CI/CD engine securely injects the prod host via ENV Variables
+      host: https://dbc-fcb103e0-45c4.cloud.databricks.com # The CI/CD engine securely injects the prod host via ENV Variables
 
+  
