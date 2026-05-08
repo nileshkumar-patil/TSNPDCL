@@ -85,12 +85,7 @@ data "aws_iam_policy_document" "databricks_trust_policy" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-    condition {
-      test     = "ArnLike"
-      variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_prefix}-databricks-access-${var.environment}"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_prefix}-databricks-access-${var.environment}"]
     }
   }
 }
