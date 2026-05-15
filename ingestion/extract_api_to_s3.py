@@ -109,13 +109,14 @@ def lambda_handler(event, context):
     # Trigger Databricks if new files arrived
     if files_downloaded > 0:
 
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        trigger_file_key = f"trigger/run_{timestamp}.txt"
+        # Stamp the trigger file with year+month so each monthly run creates a unique idempotent key
+        year_month = datetime.now().strftime('%Y%m')
+        trigger_file_key = f"trigger/run_{year_month}.txt"
 
         s3_client.put_object(
             Bucket=S3_BUCKET,
             Key=trigger_file_key,
-            Body=f"Triggering pipeline. Processed {files_downloaded} new files."
+            Body=f"Monthly batch complete. Processed {files_downloaded} new file(s) for {year_month}."
         )
 
     return {
